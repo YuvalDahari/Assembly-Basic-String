@@ -1,53 +1,34 @@
 #Yuval Dahari 209125939
 
-.section .data
-n1:              .int                 # int length
-
 .section .rodata
-strFormat:      .string "%s"
-numFormat:      .string "%d"
+    pstrlenCase:       .string "first pstring length: %d, second pstring length: %d\n"                  #31
+    replaceCharCase:   .string "old char: %c, new char: %c, first string: %s, second string: %s\n"      #32 & 33
+    swapCaseCase:      .string "length: %d, string: %s\n"                                               #35 & 36
+    pstrijcmpCase:     .string "compare result: %d\n"                                                   #37
+    defaultCase:       .string "invalid option!\n"                                                      #default
 
+    scanjChar:         .string "%c"
+    scanfInt:          .string "%d"
+    scanfString:       .string "%s"
 
+    .align 16          # Align address to multiple of 16
+
+     .L10:
+        .quad .L31           # case 31
+        .quad .L32           # case 32
+        .quad .L33           # case 33
+        .quad .L35           # case 35
+        .quad .L36           # case 36
+        .quad .L37           # case 37
+        .quad .LDefault      # default case
 	########
-	.text	#the beginnig of the code
-.globl	func_select	#the label "main" is used to state the initial point of this program
-	.type	main, @function	# the label "main" representing the beginning of a function
-func_select:
-    movq        %rsp, %rbp              # create the new frame pointer
-    pushq       %rbp                    # save the old frame pointer
-    movq        %rsp, %rbp              # create the new frame pointer
+.section .text
 
-    subq        $528, %rsp
-
-    movq        $numFormat, %rdi        # load format for int
-    leaq        (%rsp), %rsi            # set storage to address of n1
-    xorq        %rax, %rax              # clear rax
-    call scanf
-    movb        %sil, (%rsp)            # put n1 in the stack (n1 < 255 so it's requires only one byte)
-
-    xorq        %rdi, %rdi              # clear rdi
-    xorq        %rsi, %rsi              # clear rsi
-    movq        $strFormat, %rdi        # load format for string
-    leaq        1(%rsp), %rsi           # set storage to address of str1
-    xorq        %rax, %rax              # clear rax
-    call scanf
-    movq        %rsi, 1(%rsp)           # set storage to address of str1
-
-    movq        $numFormat, %rdi        # load format string
-    xorq        %rsi, %rsi              # clear rsi
-    movb        (%rsp), %sil            # set storage to address of n1
-    xorq        %rax, %rax              # clear rax
-    call printf
-
-    xorq        %rdi, %rdi              # clear rdi
-    movq        $strFormat, %rdi
-    xorq        %rsi, %rsi
-    leaq        1(%rsp), %rsi
-    movq        (%rsi), %rsi
-    xorq        %rax, %rax
-    call printf
-
-    movq	 $0, %rax                # return value is zero
-    movq	 %rbp, %rsp              # restore the old stack pointer - release all used memory.
-    popq	 %rbp                    # restore old frame pointer
-    ret             		          # return
+.globl	run_func
+	.type	run_func, @function
+# void run_func(Pstring* pstr1, Pstring* pstr2, int choice)
+# pstr1 in %rdi, pstr2 in %rsi, choice in %rdx
+run_func:
+    movq        %rsp, %rbp               # create the new frame pointer
+    pushq       %rbp                     # save the old frame pointer
+    movq        %rsp, %rbp               # create the new frame pointer

@@ -23,6 +23,7 @@ run_main:
     leaq        (%rsp), %rsi             # set storage to address of n1
     xorq        %rax, %rax               # clear rax
     call        scanf
+    xorq        %rax, %rax               # clear rax
     movb        %sil, (%rsp)             # put n1 in the stack (n1 < 255 so it's requires only one byte)
     
     # scanf str1
@@ -32,6 +33,7 @@ run_main:
     leaq        1(%rsp), %rsi            # set storage to address of str1
     xorq        %rax, %rax               # clear rax
     call        scanf
+    xorq        %rax, %rax               # clear rax
     movq        %rsi, 1(%rsp)            # set storage to address of str1
     #movb        $0, 255(%rsp)           # put /0 in the end of the str1
     
@@ -41,6 +43,7 @@ run_main:
     leaq        256(%rsp), %rsi          # set storage to address of n2
     xorq        %rax, %rax               # clear rax
     call        scanf
+    xorq        %rax, %rax               # clear rax
     movb        %sil, 256(%rsp)          # put n2 in the stack (n2 < 255 so it's requires only one byte)
     
     # scanf str2
@@ -50,6 +53,7 @@ run_main:
     leaq        257(%rsp), %rsi          # set storage to address of str2
     xorq        %rax, %rax               # clear rax
     call        scanf
+    xorq        %rax, %rax               # clear rax
     movq        %rsi, 257(%rsp)          # set storage to address of str2
     #movb        $0, 511(%rsp)           # put /0 in the end of the str2
     
@@ -58,6 +62,7 @@ run_main:
     leaq        512(%rsp), %rsi          # set storage to address of choice
     xorq        %rax, %rax               # clear rax
     call        scanf
+    xorq        %rax, %rax               # clear rax
     movq        %rsi, 512(%rsp)          # put choice in the stack
     
     # assigning variables for run_func

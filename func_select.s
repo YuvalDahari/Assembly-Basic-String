@@ -21,6 +21,7 @@
         .quad .L36           # case 36
         .quad .L37           # case 37
         .quad .LDefault      # default case
+
 	########
 .section .text
 

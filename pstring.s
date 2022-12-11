@@ -55,8 +55,8 @@ replaceChar:
     # Releasing and restoring the stack and rgisters memory
     movq        -8(%rbp), %rbx           # restore rbx
     movq        -16(%rbp), %r12          # restore r12
-    pop         %r12                     # restore rbx
-    pop         %rbx                     # restore r12
+    popq         %r12                    # restore rbx
+    popq         %rbx                    # restore r12
     movq	    %rbp, %rsp               # restore the old stack pointer - release all used memory
     popq	    %rbp                     # restore old frame pointer
 

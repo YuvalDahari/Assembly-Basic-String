@@ -35,7 +35,11 @@ run_main:
     call        scanf
     xorq        %rax, %rax               # clear rax
     movq        %rsi, 1(%rsp)            # set storage to address of str1
-    #movb        $0, 255(%rsp)           # put /0 in the end of the str1
+    xorq        %r8, %r8                 # clear r8
+    xorq        %r9, %r9                 # clear r9
+    movq        (%rsp), %r8              # saving n1 as r8 adress
+    leaq        1(%rsp, %r8), %r9        # calculate the adress of the end of the str1
+    movb        $0, %r9                  # put /0 in the end of the str1
     
     
     # scanf n2
@@ -45,7 +49,7 @@ run_main:
     call        scanf
     xorq        %rax, %rax               # clear rax
     movb        %sil, 256(%rsp)          # put n2 in the stack (n2 < 255 so it's requires only one byte)
-    
+
     # scanf str2
     xorq        %rdi, %rdi               # clear rdi
     xorq        %rsi, %rsi               # clear rsi
@@ -55,7 +59,11 @@ run_main:
     call        scanf
     xorq        %rax, %rax               # clear rax
     movq        %rsi, 257(%rsp)          # set storage to address of str2
-    #movb        $0, 511(%rsp)           # put /0 in the end of the str2
+    xorq        %r8, %r8                 # clear r8
+    xorq        %r9, %r9                 # clear r9
+    movq        (%rsp), %r8              # saving n2 as r8 adress
+    leaq        1(%rsp, %r8), %r9        # calculate the adress of the end of the str2
+    movb        $0, %r9                  # put /0 in the end of the str2
     
     # scanf choice
     movq        $numFormat, %rdi         # load format for int

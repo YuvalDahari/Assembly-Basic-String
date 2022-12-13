@@ -55,8 +55,8 @@ replaceChar:
     # Releasing and restoring the stack and rgisters memory
     movq        -8(%rbp), %rbx           # restore rbx
     movq        -16(%rbp), %r12          # restore r12
-    popq         %r12                    # restore rbx
-    popq         %rbx                    # restore r12
+    popq        %r12                     # restore rbx
+    popq        %rbx                     # restore r12
     movq	    %rbp, %rsp               # restore the old stack pointer - release all used memory
     popq	    %rbp                     # restore old frame pointer
 
@@ -79,8 +79,8 @@ pstrijcpy:
     pushq       %rsi                     # saving rsi in the stack for restoring in case of prinf
     pushq       %rdi                     # saving rdi in the stack for restoring in case of prinf
 
-    leaq        1(%rdi), %r12            # char* temp = src->str
-    leaq        1(%rsi), %r13            # char* temp = dst->str
+    leaq        1(%rdi), %r12            # char* temp1 = src->str
+    leaq        1(%rsi), %r13            # char* temp2 = dst->str
 
     # Varify input
     cmpb        %cl, %dl                 # if (i > j)

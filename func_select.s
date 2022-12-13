@@ -7,20 +7,21 @@
     pstrijcmpCase:     .string "compare result: %d\n"                                                   #37
     defaultCase:       .string "invalid option!\n"                                                      #default
 
-    scanjChar:         .string "%c"
+    scanfChar:         .string "%c"
     scanfInt:          .string "%d"
     scanfString:       .string "%s"
 
     .align 16          # Align address to multiple of 16
 
      .L10:
-        .quad .L31           # case 31
-        .quad .L32           # case 32
-        .quad .L33           # case 33
-        .quad .L35           # case 35
-        .quad .L36           # case 36
-        .quad .L37           # case 37
-        .quad .LDefault      # default case
+        .quad .case31           # case 31
+        .quad .case32           # case 32
+        .quad .case33           # case 33
+        .quad .case34           # default
+        .quad .case35           # case 35
+        .quad .case36           # case 36
+        .quad .case37           # case 37
+        .quad .caseDefualt      # default
 
 	########
 .section .text
@@ -30,6 +31,78 @@
 # void run_func(Pstring* pstr1, Pstring* pstr2, int choice)
 # pstr1 in %rdi, pstr2 in %rsi, choice in %rdx
 run_func:
-    movq        %rsp, %rbp               # create the new frame pointer
     pushq       %rbp                     # save the old frame pointer
     movq        %rsp, %rbp               # create the new frame pointer
+    pushq       %r12                     # r12 is a callee save
+    pushq       %r13                     # r13 is a callee save
+
+    leaq        (%rdi), %r12             # Pstr* temp = src->str
+    leaq        (%rsi), %r13             # Pstr* temp = dst->str
+
+    leaq        -30(%rdx),  %r8          # Compute c = choice - 30
+    cmpq
+    # switch case (choice):
+    cmpq        $31, %rdx                # case (31)
+    je          .case31
+
+  .case31:                               # pstrlen
+    xorq        %rax, %rax               # char size1 = 0
+    call        pstrlen                  # size1 = pstr1->size
+    movq        %rax, %r8                # r8 = size1
+
+    movq        %rsi, %rdi               # rdi = &pstr2
+    xorq        %rax, %rax               # char size2 = 0
+    call        pstrlen                  # size2 = pstr2->size
+    movq        %rax, %r9                # r9 = size2
+
+    movq        $pstrlenCase, %rdi       # load format for print
+    movq        %r8, %rsi                # first variable - size1
+    movq        %r9, %rdx                # second variable - size2
+    xorq        %rax, %rax               # clear rax
+    call        printf
+
+    jmp .End                             # break
+
+  .case32:                               # replaceChar
+    movq        $scanfChar, %rdi         # load format for scanf
+    leaq        (%r10), %rsi             # set storage to address the old char
+    xorq        %rax, %rax               # clear rax
+    call        scanf
+
+    movq        $scanfChar, %rdi         # load format for scanf
+    leaq        (%r9), %rsi              # set storage to address the new char
+    xorq        %rax, %rax               # clear rax
+    call        scanf
+
+    leaq        (%r12), %rdi             # first variable - pstr1
+    xorq        %rsi, %rsi               # clear rsi
+    leaq        (%r10), %rsi             # second variable - old char
+    xorq        %rdx, %rdx               # clear rdx
+    leaq        (%r9), %rdx              # third variable - new char
+    call        replaceChar
+    movq        %rax, %r12               # put the update pstr1 in r12
+
+    leaq        (%r13), %rdi             # first variable - pstr2
+    xorq        %rsi, %rsi               # clear rsi
+    leaq        (%r10), %rsi             # second variable - old char
+    xorq        %rdx, %rdx               # clear rdx
+    leaq        (%r9), %rdx              # third variable - new char
+    call        replaceChar
+    movq        %rax, %r13               # put the update pstr2 in r13
+
+    movq        $replaceCharCase, %rdi   # load format for printf
+    xorq        %rsi, %rsi               # clear rsi
+    leaq        (%r10), %rsi             # first variable - old char
+    xorq        %rdx, %rdx               # clear rdx
+    leaq        (%r9), %rdx              # second variable - new char
+    leaq        1(%r12), %rcx            # third variable - pstr1->str
+    leaq        1(%r13), %r8             # forth variable - pstr2->str
+    xorq        %rax, %rax               # clear rax
+    call        printf
+
+    jmp         .End                     # break
+
+  .case33:
+    jmp         .case32
+
+  .case35:

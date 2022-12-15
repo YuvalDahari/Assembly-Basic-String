@@ -102,7 +102,26 @@ run_func:
 
     jmp         .End                     # break
 
-  .case33:
+  .case33:                               # replaceChar
     jmp         .case32
 
-  .case35:
+  .case35:                               # pstrijcpy
+    movq        $scanfInt, %rdi          # load format for scanf
+    leaq        (%r10), %rsi             # set storage to address the start's index i
+    xorq        %rax, %rax               # clear rax
+    call        scanf
+
+    movq        $scanfInt, %rdi          # load format for scanf
+    leaq        (%r9), %rsi              # set storage to address the finish's index j
+    xorq        %rax, %rax               # clear rax
+    call        scanf
+
+    leaq        (%r12), %rdi             # first variable - pstr1
+    leaq        (%r13), %rsi             # second variable - pstr2
+    leaq        (%r10), %rdx             # third variable - index i
+    leaq        (%r9), %rcx              # forth variable - index j
+
+    call        pstrijcpy
+
+
+

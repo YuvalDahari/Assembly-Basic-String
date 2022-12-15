@@ -35,12 +35,6 @@ run_main:
     call        scanf
     xorq        %rax, %rax               # clear rax
     movq        %rsi, 1(%rsp)            # set storage to address of str1
-    xorq        %r8, %r8                 # clear r8
-    xorq        %r9, %r9                 # clear r9
-    movq        (%rsp), %r8              # saving n1 as r8 adress
-    leaq        1(%rsp, %r8), %r9        # calculate the adress of the end of the str1
-    movb        $0, %r9                  # put /0 in the end of the str1
-    
     
     # scanf n2
     movq        $numFormat, %rdi         # load format for int
@@ -59,11 +53,6 @@ run_main:
     call        scanf
     xorq        %rax, %rax               # clear rax
     movq        %rsi, 257(%rsp)          # set storage to address of str2
-    xorq        %r8, %r8                 # clear r8
-    xorq        %r9, %r9                 # clear r9
-    movq        (%rsp), %r8              # saving n2 as r8 adress
-    leaq        1(%rsp, %r8), %r9        # calculate the adress of the end of the str2
-    movb        $0, %r9                  # put /0 in the end of the str2
     
     # scanf choice
     movq        $numFormat, %rdi         # load format for int

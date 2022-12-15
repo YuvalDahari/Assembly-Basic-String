@@ -67,7 +67,7 @@ replaceChar:
                                          # src[i:j] (including) into dst[i:j] (including) and returns the
                                          # pointer to dst.
 # Pstring* pstrijcpy(Pstring* dst, Pstring* src, char i, char j)
-# dst in %rdi, src in %rsi, i in %dl, j in %cl
+# dst in %rdi, src in %rsi, i in %rdx, j in %rcx
 pstrijcpy:
     pushq       %rbp                     # save the old frame pointer
     movq        %rsp, %rbp               # create the new frame pointer
@@ -83,22 +83,22 @@ pstrijcpy:
     leaq        1(%rsi), %r13            # char* temp2 = dst->str
 
     # Varify input
-    cmpb        %cl, %dl                 # if (i > j)
+    cmpq        %rcx, %rdx               # if (i > j)
     jg          .Error                   # print("invalid input!\n")
-    cmpb        $0, %dl                  # if (i < 0)
+    cmpq        $0, %rdx                 # if (i < 0)
     jl          .Error                   # print("invalid input!\n")
 
     # Checking the boundaries
     xorq        %rax, %rax               # char dstSize = 0
     call        pstrlen                  # dstSize = dst->size
-    cmpb        %cl, %al                 # if (dstSize < j)
+    cmpq        %rcx, %rax               # if (dstSize < j)
     jl          .Eroor                   # print("invalid input!\n")
 
     pushq       %rdi                     # save rdi
     xorq        %rax, %rax               # char srcSize = 0
     movq        %rsi, %rdi               # initialize rsi to rdi, for implements pstrlen()
     call        pstrlen                  # srcSize = src->size
-    cmpb        %cl, %al                 # if (srcSize < j)
+    cmpq        %rcx, %rax               # if (srcSize < j)
     jl          .Eroor                   # print("invalid input!\n")
 
     popq        %rdi                     # restore rdi

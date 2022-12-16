@@ -203,16 +203,96 @@ swapCase:
 .type	pstrijcmp, @function	         # The function gets two pointers to Pstring, and compers lexicographic
                                          # pstr2->str1[i:j] and pstr2->str[i:j].
                                          # The function returns:
-                                         # pstr2->str1[i:j] > pstr2->str[i:j] => 1
-                                         # pstr2->str1[i:j] < pstr2->str[i:j] => -1
-                                         # pstr2->str1[i:j] = pstr2->str[i:j] => 0
+                                         # if pstr2->str1[i:j] > pstr2->str[i:j] =>  1
+                                         # if pstr2->str1[i:j] < pstr2->str[i:j] => -1
+                                         # if pstr2->str1[i:j] = pstr2->str[i:j] =>  0
+                                         # if i or j are invalid                 => -2
 # int pstrijcmp(Pstring* pstr1, Pstring* pstr2, char i, char j)
 # pstr1 in %rdi, pstr2 in %rsi, i in %dl, j in %cl
 pstrijcmp:
     pushq       %rbp                     # save the old frame pointer
     movq        %rsp, %rbp               # create the new frame pointer
+    pushq       %r12                     # r12 is a callee save
+    pushq       %r13                     # r13 is a callee save
+    pushq       %r14                     # register for the compare
+    xorq        %r14, %r14               # clear r14
 
-    ### finish it ###
+    pushq       %rsi                     # saving rsi in the stack for restoring in case of prinf
+    pushq       %rdi                     # saving rdi in the stack for restoring in case of prinf
+
+    leaq        1(%rdi), %r12            # char* temp1 = src->str
+    leaq        1(%rsi), %r13            # char* temp2 = dst->str
+
+    # Varify input
+    cmpq        %rcx, %rdx               # if (i > j)
+    jg          .Error                   # print("invalid input!\n") & return -2
+    cmpq        $0, %rdx                 # if (i < 0)
+    jl          .Error                   # print("invalid input!\n") & return -2
+
+    # Checking the boundaries
+    xorq        %rax, %rax               # char dstSize = 0
+    call        pstrlen                  # dstSize = dst->size
+    cmpq        %rcx, %rax               # if (dstSize < j)
+    jl          .Eroor                   # print("invalid input!\n") & return -2
+
+    pushq       %rdi                     # save rdi
+    xorq        %rax, %rax               # char srcSize = 0
+    movq        %rsi, %rdi               # initialize rsi to rdi, for implements pstrlen()
+    call        pstrlen                  # srcSize = src->size
+    cmpq        %rcx, %rax               # if (srcSize < j)
+    jl          .Eroor                   # print("invalid input!\n") & return -2
+
+    popq        %rdi                     # restore rdi
+
+  .WhileLoop:
+    cmpb        %cl, %dl                 # if (i > j)
+    jg          .EndLoop                 # break
+
+  .Comper:
+    movb        (%r12), %r14b            # temp = dst[i]
+    movb        %r14b, (%r13)            # comper (temp (dst[i]) & src[i])
+
+    jg          .Lg                      # src[i] > dst[i]
+    jl          .Ll                      # src[i] < dst[i]
+
+    incb        %cl                      # i++
+    incq        %r12
+    incq        %r14
+
+  .Lg:
+    movq        $-1, %r14                # set compare value as -1
+    jmp         .End
+
+  .Ll:
+    movq        $1, %r14                 # set compare value as 1
+    jmp         .End
+
+    incb        %cl                      # i++
+    incq        %r12
+    incq        %r13
+    jmp         .WhileLoop               # continue
+
+  .EndLoop:
+    movq        $0, %r14                 # set compare value as 0
+    jmp         .End
+
+  .Error:
+    movq        $error, %rdi             # load format string
+    xorq        %rax, %rax               # clear rax
+    call        print
+    movq        $-2, %r14                # set compare value as -2
+
+  .End:
+    movq        %r14, %rax               # set return value as compare value
+    popq        %r14                     # restore r14
+    popq        %r13                     # restore r13
+    popq        %r12                     # restore r12
+    movq	    %rbp, %rsp               # restore the old stack pointer - release all used memory
+    popq	    %rbp                     # restore old frame pointer
+
+    ret                                  # return compare's value
+
+
 
 
 

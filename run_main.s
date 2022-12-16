@@ -18,7 +18,6 @@ run_main:
     # the user choise. Scanf function requires that (%rsp) will be in 16 jumps, so we assign 256*2+16 = 528 bytes.
     subq        $528, %rsp 
     
-    # scanf n1
     movq        $numFormat, %rdi         # load format for int
     leaq        (%rsp), %rsi             # set storage to address of n1
     xorq        %rax, %rax               # clear rax
@@ -26,7 +25,6 @@ run_main:
     xorq        %rax, %rax               # clear rax
     movb        %sil, (%rsp)             # put n1 in the stack (n1 < 255 so it's requires only one byte)
     
-    # scanf str1
     xorq        %rdi, %rdi               # clear rdi
     xorq        %rsi, %rsi               # clear rsi
     movq        $strFormat, %rdi         # load format for string
@@ -36,7 +34,6 @@ run_main:
     xorq        %rax, %rax               # clear rax
    # movq        %rsi, 1(%rsp)            # set storage to address of str1
     
-    # scanf n2
     movq        $numFormat, %rdi         # load format for int
     leaq        256(%rsp), %rsi          # set storage to address of n2
     xorq        %rax, %rax               # clear rax
@@ -44,7 +41,6 @@ run_main:
     xorq        %rax, %rax               # clear rax
    # movb        %sil, 256(%rsp)          # put n2 in the stack (n2 < 255 so it's requires only one byte)
 
-    # scanf str2
     xorq        %rdi, %rdi               # clear rdi
     xorq        %rsi, %rsi               # clear rsi
     movq        $strFormat, %rdi         # load format for string
@@ -54,7 +50,6 @@ run_main:
     xorq        %rax, %rax               # clear rax
    # movq        %rsi, 257(%rsp)          # set storage to address of str2
     
-    # scanf choice
     movq        $numFormat, %rdi         # load format for int
     leaq        512(%rsp), %rsi          # set storage to address of choice
     xorq        %rax, %rax               # clear rax
@@ -62,7 +57,6 @@ run_main:
     xorq        %rax, %rax               # clear rax
    # movq        %rsi, 512(%rsp)          # put choice in the stack
     
-    # assigning variables for run_func
     xorq        %rdi, %rdi               # clear rdi
     xorq        %rsi, %rsi               # clear rsi
     xorq        %rdx, %rdx               # clear rdx

@@ -217,9 +217,6 @@ pstrijcmp:
     pushq       %r14                     # register for the compare
     xorq        %r14, %r14               # clear r14
 
-    pushq       %rsi                     # saving rsi in the stack for restoring in case of prinf
-    pushq       %rdi                     # saving rdi in the stack for restoring in case of prinf
-
     leaq        1(%rdi), %r12            # char* temp1 = src->str
     leaq        1(%rsi), %r13            # char* temp2 = dst->str
 

@@ -34,7 +34,7 @@ run_main:
     xorq        %rax, %rax               # clear rax
     call        scanf
     xorq        %rax, %rax               # clear rax
-    movq        %rsi, 1(%rsp)            # set storage to address of str1
+   # movq        %rsi, 1(%rsp)            # set storage to address of str1
     
     # scanf n2
     movq        $numFormat, %rdi         # load format for int
@@ -42,7 +42,7 @@ run_main:
     xorq        %rax, %rax               # clear rax
     call        scanf
     xorq        %rax, %rax               # clear rax
-    movb        %sil, 256(%rsp)          # put n2 in the stack (n2 < 255 so it's requires only one byte)
+   # movb        %sil, 256(%rsp)          # put n2 in the stack (n2 < 255 so it's requires only one byte)
 
     # scanf str2
     xorq        %rdi, %rdi               # clear rdi
@@ -52,7 +52,7 @@ run_main:
     xorq        %rax, %rax               # clear rax
     call        scanf
     xorq        %rax, %rax               # clear rax
-    movq        %rsi, 257(%rsp)          # set storage to address of str2
+   # movq        %rsi, 257(%rsp)          # set storage to address of str2
     
     # scanf choice
     movq        $numFormat, %rdi         # load format for int
@@ -60,7 +60,7 @@ run_main:
     xorq        %rax, %rax               # clear rax
     call        scanf
     xorq        %rax, %rax               # clear rax
-    movq        %rsi, 512(%rsp)          # put choice in the stack
+   # movq        %rsi, 512(%rsp)          # put choice in the stack
     
     # assigning variables for run_func
     xorq        %rdi, %rdi               # clear rdi

@@ -1,4 +1,4 @@
-#Yuval Dahari 209125939
+# Yuval Dahari 209125939
 
 .section .rodata
     strFormat:      .string "%s"         # format for string input & output

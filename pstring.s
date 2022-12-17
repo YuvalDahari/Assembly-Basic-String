@@ -1,7 +1,7 @@
-#Yuval Dahari 209125939
+# Yuval Dahari 209125939
 
 .section .rodata
-    error:      .string "invalid input!\n"   # format for invalid input
+    error:  .string "invalid input!\n"   # format for invalid input
 
 	########
 .section .text
@@ -12,7 +12,7 @@
 # pstr in %rdi
 pstrlen:
     xorq        %rax, %rax               # char size = 0
-    movb        (%dil), %al              # size = pstr->size
+    movb        (%rdi), %al              # size = pstr->size
     ret                                  # return size
 
 .globl	replaceChar
@@ -35,21 +35,21 @@ replaceChar:
     xorq        %rcx, %rcx               # int i = 0
     movq        $1, %rcx                 # i = 1
 
-  .WhileLoop:
+  .ReaplaceLoop:
     cmpq        %rcx, %r12               # while(i <= size)
-    jg          .EndLoop                 # break
+    jg          .EndReaplaceLoop         # break
 
   .IfEqual:
     cmpb        (%rbx), %sil             # if (temp[i] == oldChar)
-    jg          .Swap
+    jg          .Reaplace
 
-  .Swap:
+  .Reaplace:
     movb        %dl, (%rbx)              # temp[i] = newChar
     addq        $1, (%rcx)               # i++
     leaq        1(%rbx), %rbx            # move to the next char
-    jmp         .WhileLoop               # continue
+    jmp         .ReaplaceLoop            # continue
 
-  .EndLoop:
+  .EndReaplaceLoop:
     movq        %rdi, %rax               # updating return value
 
     # Releasing and restoring the stack and rgisters memory
@@ -84,45 +84,45 @@ pstrijcpy:
 
     # Varify input
     cmpq        %rcx, %rdx               # if (i > j)
-    jg          .Error                   # print("invalid input!\n")
+    jg          .CopyFail                # print("invalid input!\n")
     cmpq        $0, %rdx                 # if (i < 0)
-    jl          .Error                   # print("invalid input!\n")
+    jl          .CopyFail                # print("invalid input!\n")
 
     # Checking the boundaries
     xorq        %rax, %rax               # char dstSize = 0
     call        pstrlen                  # dstSize = dst->size
     cmpq        %rcx, %rax               # if (dstSize < j)
-    jl          .Eroor                   # print("invalid input!\n")
+    jl          .CopyFail                # print("invalid input!\n")
 
     pushq       %rdi                     # save rdi
     xorq        %rax, %rax               # char srcSize = 0
     movq        %rsi, %rdi               # initialize rsi to rdi, for implements pstrlen()
     call        pstrlen                  # srcSize = src->size
     cmpq        %rcx, %rax               # if (srcSize < j)
-    jl          .Eroor                   # print("invalid input!\n")
+    jl          .CopyFail                # print("invalid input!\n")
 
     popq        %rdi                     # restore rdi
 
-  .WhileLoop:
+  .CopyLoop:
     cmpb        %cl, %dl                 # if (i > j)
-    jg          .EndLoop                 # break
+    jg          .EndCopyLoop             # break
 
-  .Swap:
+  .Copy:
     movb        (%r12), %r14b            # temp = dst[i]
     movb        %r14b, (%r13)            # src[i] = temp
 
     incb        %cl                      # i++
     incq        %r12
     incq        %r13
-    jmp         .WhileLoop               # continue
+    jmp         .CopyLoop                # continue
 
-  .EndLoop:
+  .EndCopyLoop:
     movq        %rdi, %r15               # put the updating dst in r15
     popq        %rdi                     # restore rdi
     popq        %rsi                     # restore rsi
-    jmp         .End
+    jmp         .EndCopy
 
-  .Error:
+  .CopyFail:
     movq        $error, %rdi             # load format string
     xorq        %rax, %rax               # clear rax
     call        print
@@ -130,7 +130,7 @@ pstrijcpy:
     popq        %rdi                     # restore rdi
     popq        %rsi                     # restore rsi
 
-  .End:
+  .EndCopy:
     movq        %r15, %rax               # making rax (the return value) as pointer to the updating dst
     popq        %r15                     # restore r15
     popq        %r14                     # restore r14
@@ -162,9 +162,9 @@ swapCase:
     xorq        %rcx, %rcx               # int i = 0
     movq        $1, %rcx                 # i = 1
 
-  .WhileLoop:
+  .SwapLoop:
     cmpq        %rcx, %r12               # while(i <= size)
-    jg          .EndLoop                 # break
+    jg          .EndSwapLoop             # break
 
   .UpperCase:
     cmpb    $90, (%rbx)                  # if (pstr->str[i - 1] > 90)
@@ -191,7 +191,7 @@ swapCase:
     incq    %rbx
     jmp     .WhileLoop                   # continue
 
-  .EndLoop:
+  .EndSwapLoop:
     movq    %rdi, %rax                   # making rax (the return value) as pointer to the updating dst
     popq    %rbx                         # restore rbx
     movq	%rbp, %rsp                   # restore the old stack pointer - release all used memory
@@ -222,28 +222,28 @@ pstrijcmp:
 
     # Varify input
     cmpq        %rcx, %rdx               # if (i > j)
-    jg          .Error                   # print("invalid input!\n") & return -2
+    jg          .ComperFail              # print("invalid input!\n") & return -2
     cmpq        $0, %rdx                 # if (i < 0)
-    jl          .Error                   # print("invalid input!\n") & return -2
+    jl          .ComperFail              # print("invalid input!\n") & return -2
 
     # Checking the boundaries
     xorq        %rax, %rax               # char dstSize = 0
     call        pstrlen                  # dstSize = dst->size
     cmpq        %rcx, %rax               # if (dstSize < j)
-    jl          .Eroor                   # print("invalid input!\n") & return -2
+    jl          .ComperFail              # print("invalid input!\n") & return -2
 
     pushq       %rdi                     # save rdi
     xorq        %rax, %rax               # char srcSize = 0
     movq        %rsi, %rdi               # initialize rsi to rdi, for implements pstrlen()
     call        pstrlen                  # srcSize = src->size
     cmpq        %rcx, %rax               # if (srcSize < j)
-    jl          .Eroor                   # print("invalid input!\n") & return -2
+    jl          .ComperFail              # print("invalid input!\n") & return -2
 
     popq        %rdi                     # restore rdi
 
-  .WhileLoop:
+  .ComperLoop:
     cmpb        %cl, %dl                 # if (i > j)
-    jg          .EndLoop                 # break
+    jg          .EndComperLoop           # break
 
   .Comper:
     movb        (%r12), %r14b            # temp = dst[i]
@@ -258,28 +258,28 @@ pstrijcmp:
 
   .Lg:
     movq        $-1, %r14                # set compare value as -1
-    jmp         .End
+    jmp         .EndComper
 
   .Ll:
     movq        $1, %r14                 # set compare value as 1
-    jmp         .End
+    jmp         .EndComper
 
     incb        %cl                      # i++
     incq        %r12
     incq        %r13
-    jmp         .WhileLoop               # continue
+    jmp         .ComperLoop              # continue
 
-  .EndLoop:
+  .EndComperLoop:
     movq        $0, %r14                 # set compare value as 0
-    jmp         .End
+    jmp         .EndComper
 
-  .Error:
+  .ComperFail:
     movq        $error, %rdi             # load format string
     xorq        %rax, %rax               # clear rax
     call        print
     movq        $-2, %r14                # set compare value as -2
 
-  .End:
+  .EndComper:
     movq        %r14, %rax               # set return value as compare value
     popq        %r14                     # restore r14
     popq        %r13                     # restore r13

@@ -1,4 +1,4 @@
-#Yuval Dahari 209125939
+# Yuval Dahari 209125939
 
 .section .rodata
     pstrlenCase:       .string "first pstring length: %d, second pstring length: %d\n"                  #31
@@ -12,7 +12,7 @@
     scanfInt:          .string "%d"
     scanfString:       .string "%s"
 
-    .align 16                   # Align address to multiple of 16
+    .align 8                    # Align address to multiple of 16
 
     .switchCase:
         .quad .case31           # case 31
@@ -40,11 +40,14 @@ run_func:
     leaq        (%rdi), %r12             # Pstr* temp = src->str
     leaq        (%rsi), %r13             # Pstr* temp = dst->str
 
-    leaq        -30(%rdx),  %r8          # Compute c = choice - 30
-    cmpq        $7, %r8                  # if (chice > 7)
+    cmpq        $37, %r8                 # if (chice > 37)
     ja          .caseDefault             # go to default case, the chice is invalid
 
-    jmp         *.switchCase(, %r8, 16)  # else switchCase[choice]
+    cmpq        $31, %r8                 # if (chice < 31)
+    jb          .caseDefault             # go to default case, the chice is invalid
+
+    leaq        -30(%rdx),  %r8          # Compute c = choice - 30
+    jmp         *.switchCase(, %r8, 8)   # else switchCase[choice]
 
   .case31:                               # pstrlen
     xorq        %rax, %rax               # char size1 = 0

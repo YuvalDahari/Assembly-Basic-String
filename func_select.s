@@ -97,8 +97,8 @@ run_func:
     movq        %rax, %r13               # put the update pstr2 in r13
 
     movq        $replaceCharCase, %rdi   # load format for printf
-    leaq        (%rsp), %rsi             # first variable - old char
-    leaq        16(%rsp), %rdx           # second variable - new char
+    movq        (%rsp), %rsi             # first variable - old char
+    movq        16(%rsp), %rdx           # second variable - new char
     leaq        1(%r12), %rcx            # third variable - pstr1->str
     leaq        1(%r13), %r8             # forth variable - pstr2->str
     xorq        %rax, %rax               # clear rax
@@ -132,7 +132,7 @@ run_func:
     movb        16(%rsp), %cl            # forth variable - index j
 
     call        pstrijcpy
-    leaq        (%rax), %rdi             # rdi = (updated)
+    movq        %rax, %rdi               # making rdi as pointer to the updating pstr1
     pushq       %rdi                     # save rdi
 
     xorq        %rax, %rax               # char size1 = 0

@@ -83,23 +83,23 @@ pstrijcpy:
     leaq        1(%rsi), %r13            # char* temp2 = dst->str
 
     # Varify input
-    cmpq        %rcx, %rdx               # if (i > j)
+    cmpb        %cl, %dl                 # if (i > j)
     jg          .CopyFail                # print("invalid input!\n")
-    cmpq        $0, %rdx                 # if (i < 0)
+    cmpb        $0, %dl                  # if (i < 0)
     jl          .CopyFail                # print("invalid input!\n")
 
     # Checking the boundaries
     xorq        %rax, %rax               # char dstSize = 0
     call        pstrlen                  # dstSize = dst->size
-    cmpq        %rcx, %rax               # if (dstSize < j)
-    jl          .CopyFail                # print("invalid input!\n")
+    cmpb        %cl, %al                 # if (j > dstSize)
+    jg          .CopyFail                # print("invalid input!\n")
 
     pushq       %rdi                     # save rdi
     xorq        %rax, %rax               # char srcSize = 0
     movq        %rsi, %rdi               # initialize rsi to rdi, for implements pstrlen()
     call        pstrlen                  # srcSize = src->size
-    cmpq        %rcx, %rax               # if (srcSize < j)
-    jl         .CopyFail                # print("invalid input!\n")
+    cmpb        %cl, %al                 # if (j > srcSize)
+    jg         .CopyFail                 # print("invalid input!\n")
 
     popq        %rdi                     # restore rdi
 
@@ -230,44 +230,51 @@ pstrijcmp:
     xorq        %rax, %rax               # char dstSize = 0
     call        pstrlen                  # dstSize = dst->size
     cmpq        %rcx, %rax               # if (dstSize < j)
-    jl          .ComperFail              # print("invalid input!\n") & return -2
+    jg          .ComperFail              # print("invalid input!\n") & return -2
 
     pushq       %rdi                     # save rdi
     xorq        %rax, %rax               # char srcSize = 0
     movq        %rsi, %rdi               # initialize rsi to rdi, for implements pstrlen()
     call        pstrlen                  # srcSize = src->size
     cmpq        %rcx, %rax               # if (srcSize < j)
-    jl          .ComperFail              # print("invalid input!\n") & return -2
+    jg          .ComperFail              # print("invalid input!\n") & return -2
 
     popq        %rdi                     # restore rdi
 
+    xorq        %r8, %r8                 # int k = 0
+
+  .InitializeLoop:
+    cmpb        %dl, %r8b                # if (k < i)
+    je          .ComperLoop              # break
+    incb        %r8b                     # k++
+    incq        %r12
+    incq        %r13
+    jmp         .InitializeLoop          # continue
+
   .ComperLoop:
-    cmpb        %cl, %dl                 # if (i > j)
+    cmpb        %cl, %dl                 # if (i != j)
     je          .EndComperLoop           # break
 
   .Comper:
     movb        (%r12), %r14b            # temp = dst[i]
-    movb        %r14b, (%r13)            # comper (temp (dst[i]) & src[i])
+    cmpb        %r14b, (%r13)            # comper (temp (dst[i]) & src[i])
 
-    jg          .Lg                      # src[i] > dst[i]
-    jl          .Ll                      # src[i] < dst[i]
+    ja          .Lg                      # src[i] > dst[i]
+    jb          .Ll                      # src[i] < dst[i]
 
     incb        %dl                      # i++
     incq        %r12
-    incq        %r14
+    incq        %r13
 
-  .Lg:
+    jmp         .ComperLoop              # continue
+
+  .Ll:
     movq        $-1, %r14                # set compare value as -1
     jmp         .EndComper
 
-  .Ll:
+  .Lg:
     movq        $1, %r14                 # set compare value as 1
     jmp         .EndComper
-
-    incb        %cl                      # i++
-    incq        %r12
-    incq        %r13
-    jmp         .ComperLoop              # continue
 
   .EndComperLoop:
     movq        $0, %r14                 # set compare value as 0

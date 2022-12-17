@@ -92,16 +92,26 @@ pstrijcpy:
     xorq        %rax, %rax               # char dstSize = 0
     call        pstrlen                  # dstSize = dst->size
     cmpb        %cl, %al                 # if (j > dstSize)
-    jg          .CopyFail                # print("invalid input!\n")
+    jl          .CopyFail                # print("invalid input!\n")
 
     pushq       %rdi                     # save rdi
     xorq        %rax, %rax               # char srcSize = 0
     movq        %rsi, %rdi               # initialize rsi to rdi, for implements pstrlen()
     call        pstrlen                  # srcSize = src->size
     cmpb        %cl, %al                 # if (j > srcSize)
-    jg         .CopyFail                 # print("invalid input!\n")
+    jl         .CopyFail                 # print("invalid input!\n")
 
     popq        %rdi                     # restore rdi
+
+    xorq        %r8, %r8                 # int k = 0
+
+  .InitializeForCpy:
+    cmpb        %dl, %r8b                # if (k < i)
+    je          .CopyLoop                # break
+    incb        %r8b                     # k++
+    incq        %r12
+    incq        %r13
+    jmp         .InitializeForCpy        # continue
 
   .CopyLoop:
     cmpb        %cl, %dl                 # if (i != j)
@@ -243,13 +253,13 @@ pstrijcmp:
 
     xorq        %r8, %r8                 # int k = 0
 
-  .InitializeLoop:
+  .InitializeForCmp:
     cmpb        %dl, %r8b                # if (k < i)
     je          .ComperLoop              # break
     incb        %r8b                     # k++
     incq        %r12
     incq        %r13
-    jmp         .InitializeLoop          # continue
+    jmp         .InitializeForCmp        # continue
 
   .ComperLoop:
     cmpb        %cl, %dl                 # if (i != j)

@@ -2,17 +2,17 @@
 
 .section .rodata
     pstrlenCase:       .string "first pstring length: %d, second pstring length: %d\n"                  #31
-    replaceCharCase:   .string "old char: %c, new char: %c, first string: %s, second string: %s\n"      #32 & 33
+    replaceCharCase:   .string "old char: %s, new char: %s, first string: %s, second string: %s\n"      #32 & 33
     pstrijcpyCase:     .string "length: %d, string: %s\n"                                               #35
     swapCaseCase:      .string "length: %d, string: %s\n"                                               #36
     pstrijcmpCase:     .string "compare result: %d\n"                                                   #37
     defaultCase:       .string "invalid option!\n"                                                      #default
 
-    scanfChar:         .string "%c"
+    scanfChar:         .string "%s"
     scanfInt:          .string "%d"
     scanfString:       .string "%s"
 
-    .align 8                    # Align address to multiple of 16
+    .align 8                    # Align address to multiple of 8
 
     .switchCase:
         .quad .case31           # case 31
@@ -22,7 +22,7 @@
         .quad .case35           # case 35
         .quad .case36           # case 36
         .quad .case37           # case 37
-        .quad .caseDefualt      # default
+        .quad .caseDefault      # default
 
 	########
 .section .text
@@ -40,13 +40,13 @@ run_func:
     leaq        (%rdi), %r12             # Pstr* temp = src->str
     leaq        (%rsi), %r13             # Pstr* temp = dst->str
 
-    cmpq        $37, %r8                 # if (chice > 37)
+    cmpq        $37, %rdx                # if (chice > 37)
     ja          .caseDefault             # go to default case, the chice is invalid
 
-    cmpq        $31, %r8                 # if (chice < 31)
+    cmpq        $31, %rdx                # if (chice < 31)
     jb          .caseDefault             # go to default case, the chice is invalid
 
-    leaq        -30(%rdx),  %r8          # Compute c = choice - 30
+    leaq        -31(%rdx),  %r8          # Compute c = choice - 31, for fitiing the jump table
     jmp         *.switchCase(, %r8, 8)   # else switchCase[choice]
 
   .case31:                               # pstrlen
@@ -68,65 +68,68 @@ run_func:
     jmp .End                             # break
 
   .case32:                               # replaceChar
+    subq        $32, %rsp                # allocate memory for two scanf
+
     movq        $scanfChar, %rdi         # load format for scanf
-    leaq        (%r10), %rsi             # set storage to address the old char
+    leaq        (%rsp), %rsi             # set storage to address the old char
     xorq        %rax, %rax               # clear rax
     call        scanf
 
     movq        $scanfChar, %rdi         # load format for scanf
-    leaq        (%r9), %rsi              # set storage to address the new char
+    leaq        16(%rsp), %rsi           # set storage to address the new char
     xorq        %rax, %rax               # clear rax
     call        scanf
 
     leaq        (%r12), %rdi             # first variable - pstr1
     xorq        %rsi, %rsi               # clear rsi
-    leaq        (%r10), %rsi             # second variable - old char
+    movq        (%rsp), %rsi             # second variable - old char
     xorq        %rdx, %rdx               # clear rdx
-    leaq        (%r9), %rdx              # third variable - new char
+    movq        16(%rsp), %rdx           # third variable - new char
     call        replaceChar
     movq        %rax, %r12               # put the update pstr1 in r12
 
     leaq        (%r13), %rdi             # first variable - pstr2
     xorq        %rsi, %rsi               # clear rsi
-    leaq        (%r10), %rsi             # second variable - old char
+    movq        (%rsp), %rsi             # second variable - old char
     xorq        %rdx, %rdx               # clear rdx
-    leaq        (%r9), %rdx              # third variable - new char
+    movq        16(%rsp), %rdx           # third variable - new char
     call        replaceChar
     movq        %rax, %r13               # put the update pstr2 in r13
 
     movq        $replaceCharCase, %rdi   # load format for printf
-    xorq        %rsi, %rsi               # clear rsi
-    leaq        (%r10), %rsi             # first variable - old char
-    xorq        %rdx, %rdx               # clear rdx
-    leaq        (%r9), %rdx              # second variable - new char
+    leaq        (%rsp), %rsi             # first variable - old char
+    leaq        16(%rsp), %rdx           # second variable - new char
     leaq        1(%r12), %rcx            # third variable - pstr1->str
     leaq        1(%r13), %r8             # forth variable - pstr2->str
     xorq        %rax, %rax               # clear rax
     call        printf
 
+    addq        $32, %rsp                # dislocate memory
     jmp         .End                     # break
 
   .case33:                               # replaceChar
     jmp         .case32
 
   .case34:                               # default
-    jmp         .caseDefualt
+    jmp         .caseDefault
 
   .case35:                               # pstrijcpy
+    subq        $32, %rsp                # allocate memory for two scanf
+
     movq        $scanfInt, %rdi          # load format for scanf
-    leaq        (%r10), %rsi             # set storage to address the start's index i
+    leaq        (%rsp), %rsi             # set storage to address the start's index i
     xorq        %rax, %rax               # clear rax
     call        scanf
 
     movq        $scanfInt, %rdi          # load format for scanf
-    leaq        (%r9), %rsi              # set storage to address the finish's index j
+    leaq        16(%rsp), %rsi           # set storage to address the finish's index j
     xorq        %rax, %rax               # clear rax
     call        scanf
 
     leaq        (%r12), %rdi             # first variable - pstr1
     leaq        (%r13), %rsi             # second variable - pstr2
-    leaq        (%r10), %rdx             # third variable - index i
-    leaq        (%r9), %rcx              # forth variable - index j
+    movb        (%rsp), %dl              # third variable - index i
+    movb        16(%rsp), %cl            # forth variable - index j
 
     call        pstrijcpy
     leaq        (%rax), %rdi             # rdi = (updated)
@@ -140,8 +143,9 @@ run_func:
     leaq        1(%rdi), %rsi            # first variable - pstr1->str
     movq        $pstrijcpyCase, %rdi     # load format for printf
     xorq        %rax, %rax               # clear rax
-    call        scanf
+    call        printf
 
+    addq        $32, %rsp                # dislocate memory
     jmp         .End                     # break
 
   .case36:                               # swapCase
@@ -153,6 +157,7 @@ run_func:
     leaq        1(%rdi), %rdx            # second variable - pstr1->str
     xorq        %rax, %rax               # clear rax
     movq        $swapCaseCase, %rdi      # load format for printf
+    call        printf
 
     leaq        (%r13), %rdi             # rdi = pstr2
     call        swapCase
@@ -163,24 +168,27 @@ run_func:
     leaq        1(%rdi), %rdx            # second variable - pstr2->str
     xorq        %rax, %rax               # clear rax
     movq        $swapCaseCase, %rdi      # load format for printf
+    call        printf
 
     jmp         .End                     # break
 
   .case37:                               # pstrijcpy
+    subq        $32, %rsp                # allocate memory for two scanf
+
     movq        $scanfInt, %rdi          # load format for scanf
-    leaq        (%r10), %rsi             # set storage to address the start's index i
+    leaq        (%rsp), %rsi             # set storage to address the start's index i
     xorq        %rax, %rax               # clear rax
     call        scanf
 
     movq        $scanfInt, %rdi          # load format for scanf
-    leaq        (%r9), %rsi              # set storage to address the finish's index j
+    leaq        16(%rsp), %rsi           # set storage to address the finish's index j
     xorq        %rax, %rax               # clear rax
     call        scanf
 
     leaq        (%r12), %rdi             # first variable - pstr1
     leaq        (%r13), %rsi             # second variable - pstr2
-    leaq        (%r10), %rdx             # third variable - index i
-    leaq        (%r9), %rcx              # forth variable - index j
+    movq        (%rsp), %rdx             # third variable - index i
+    movq        16(%rsp), %rcx           # forth variable - index j
 
     call        pstrijcmp                # int compare = 0
     movq        %rax, %rsi               # first variable - compare
@@ -188,9 +196,10 @@ run_func:
     xorq        %rax, %rax               # clear rax
     call        printf
 
+    addq        $32, %rsp                # dislocate memory
     jmp         .End                     # break
 
-  .caseDefualt:
+  .caseDefault:
     movq        $defaultCase, %rdi       # load format for printf
     xorq        %rax, %rax               # clear rax
     call        printf

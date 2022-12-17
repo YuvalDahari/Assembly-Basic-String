@@ -8,7 +8,7 @@
 
 .globl	pstrlen
 .type	pstrlen, @function	             # The function returns the length of pstring.
-# char pstrlen(Pstrin* pstr)
+# char pstrlen(Pstring* pstr)
 # pstr in %rdi
 pstrlen:
     xorq        %rax, %rax               # char size = 0
@@ -16,7 +16,7 @@ pstrlen:
     ret                                  # return size
 
 .globl	replaceChar
-.type	pstrlen, @function	             # The function return pointer to pstring after changing all the
+.type	replaceChar, @function	         # The function return pointer to pstring after changing all the
                                          # the oldChar to the newChar.
 # Pstring* replaceChar(Pstring* pstr, char oldChar, char newChar)
 # pstr in %rdi, oldChar in %sil, newChar in %dl
@@ -25,7 +25,7 @@ replaceChar:
     movq        %rsp, %rbp               # create the new frame pointer
     pushq       %rbx                     # rbx is a callee save
 
-    leaq        1(%rdi), %rbx            # char* temp = pstr->str
+    leaq        (%rdi), %rbx             # char* temp = pstr->str
     xorq        %rax, %rax               # char size = 0
     call        pstrlen                  # size = pstr->size
     pushq       %r12                     # r12 is a callee save
@@ -33,20 +33,20 @@ replaceChar:
     movq        %rax, %r12               # r12 = size
 
     xorq        %rcx, %rcx               # int i = 0
-    movq        $1, %rcx                 # i = 1
 
   .ReaplaceLoop:
+    incq        %rcx                     # i++
+    incq        %rbx                     # move to the next char
     cmpq        %rcx, %r12               # while(i <= size)
-    jg          .EndReaplaceLoop         # break
+    jl          .EndReaplaceLoop         # break
 
   .IfEqual:
     cmpb        (%rbx), %sil             # if (temp[i] == oldChar)
-    jg          .Reaplace
+    jne         .ReaplaceLoop
 
   .Reaplace:
     movb        %dl, (%rbx)              # temp[i] = newChar
-    addq        $1, (%rcx)               # i++
-    leaq        1(%rbx), %rbx            # move to the next char
+    incq        %rbx                     # move to the next char
     jmp         .ReaplaceLoop            # continue
 
   .EndReaplaceLoop:
@@ -67,7 +67,7 @@ replaceChar:
                                          # src[i:j] (including) into dst[i:j] (including) and returns the
                                          # pointer to dst.
 # Pstring* pstrijcpy(Pstring* dst, Pstring* src, char i, char j)
-# dst in %rdi, src in %rsi, i in %rdx, j in %rcx
+# dst in %rdi, src in %rsi, i in %dl, j in %cl
 pstrijcpy:
     pushq       %rbp                     # save the old frame pointer
     movq        %rsp, %rbp               # create the new frame pointer
@@ -99,19 +99,19 @@ pstrijcpy:
     movq        %rsi, %rdi               # initialize rsi to rdi, for implements pstrlen()
     call        pstrlen                  # srcSize = src->size
     cmpq        %rcx, %rax               # if (srcSize < j)
-    jl          .CopyFail                # print("invalid input!\n")
+    jl         .CopyFail                # print("invalid input!\n")
 
     popq        %rdi                     # restore rdi
 
   .CopyLoop:
-    cmpb        %cl, %dl                 # if (i > j)
-    jg          .EndCopyLoop             # break
+    cmpb        %cl, %dl                 # if (i != j)
+    je          .EndCopyLoop             # break
 
   .Copy:
     movb        (%r12), %r14b            # temp = dst[i]
     movb        %r14b, (%r13)            # src[i] = temp
 
-    incb        %cl                      # i++
+    incb        %dl                      # i++
     incq        %r12
     incq        %r13
     jmp         .CopyLoop                # continue
@@ -125,7 +125,7 @@ pstrijcpy:
   .CopyFail:
     movq        $error, %rdi             # load format string
     xorq        %rax, %rax               # clear rax
-    call        print
+    call        printf
     xorq        %rax, %rax               # clear rax
     popq        %rdi                     # restore rdi
     popq        %rsi                     # restore rsi
@@ -164,38 +164,38 @@ swapCase:
 
   .SwapLoop:
     cmpq        %rcx, %r12               # while(i <= size)
-    jg          .EndSwapLoop             # break
+    jl          .EndSwapLoop             # break
 
   .UpperCase:
-    cmpb    $90, (%rbx)                  # if (pstr->str[i - 1] > 90)
-    jg      .LowerCase                   # go to lower case checking
-    cmpb    $65, (%rbx)                  # if (pstr->str[i - 1] < 65)
-    jl      .Continue                    # special character
+    cmpb        $90, (%rbx)              # if (pstr->str[i - 1] > 90)
+    jg          .LowerCase               # go to lower case checking
+    cmpb        $65, (%rbx)              # if (pstr->str[i - 1] < 65)
+    jl          .Continue                # special character
 
-    addq    $32, (%rbx)                  # change to lower case
-    jmp     .Continue
+    addq        $32, (%rbx)              # change to lower case
+    jmp         .Continue
 
   .LowerCase:
     # if we got here so - pstr->str[i - 1] > 90
 
-    cmpb    $122, (%rbx)                 # if (pstr->str[i - 1] > 122)
-    jg      .Continue                    # special character
-    cmpb    $97, (%rbx)                  # if (pstr->str[i - 1] < 97)
-    jl      .Continue                    # special character
+    cmpb        $122, (%rbx)             # if (pstr->str[i - 1] > 122)
+    jg          .Continue                # special character
+    cmpb        $97, (%rbx)              # if (pstr->str[i - 1] < 97)
+    jl          .Continue                # special character
 
-    subq    $32, (%rbx)                  # change to upper case
-    jmp     .Continue
+    subq        $32, (%rbx)              # change to upper case
+    jmp         .Continue
 
   .Continue:
-    incq    %rcx                         # i++
-    incq    %rbx
-    jmp     .WhileLoop                   # continue
+    incq        %rcx                     # i++
+    incq        %rbx
+    jmp         .SwapLoop                # continue
 
   .EndSwapLoop:
-    movq    %rdi, %rax                   # making rax (the return value) as pointer to the updating dst
-    popq    %rbx                         # restore rbx
-    movq	%rbp, %rsp                   # restore the old stack pointer - release all used memory
-    popq	%rbp                         # restore old frame pointer
+    movq        %rdi, %rax               # making rax (the return value) as pointer to the updating dst
+    popq        %rbx                     # restore rbx
+    movq	    %rbp, %rsp               # restore the old stack pointer - release all used memory
+    popq	    %rbp                     # restore old frame pointer
 
     ret                                  # return the updated pstr
 
@@ -243,7 +243,7 @@ pstrijcmp:
 
   .ComperLoop:
     cmpb        %cl, %dl                 # if (i > j)
-    jg          .EndComperLoop           # break
+    je          .EndComperLoop           # break
 
   .Comper:
     movb        (%r12), %r14b            # temp = dst[i]
@@ -252,7 +252,7 @@ pstrijcmp:
     jg          .Lg                      # src[i] > dst[i]
     jl          .Ll                      # src[i] < dst[i]
 
-    incb        %cl                      # i++
+    incb        %dl                      # i++
     incq        %r12
     incq        %r14
 
@@ -276,7 +276,7 @@ pstrijcmp:
   .ComperFail:
     movq        $error, %rdi             # load format string
     xorq        %rax, %rax               # clear rax
-    call        print
+    call        printf
     movq        $-2, %r14                # set compare value as -2
 
   .EndComper:

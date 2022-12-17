@@ -8,7 +8,7 @@
 .section .text
 
 .globl	run_main
-	.type	main, @function
+	.type	run_main, @function
 run_main:
     movq        %rsp, %rbp               # create the new frame pointer
     pushq       %rbp                     # save the old frame pointer
@@ -32,14 +32,12 @@ run_main:
     xorq        %rax, %rax               # clear rax
     call        scanf
     xorq        %rax, %rax               # clear rax
-   # movq        %rsi, 1(%rsp)            # set storage to address of str1
-    
+
     movq        $numFormat, %rdi         # load format for int
     leaq        256(%rsp), %rsi          # set storage to address of n2
     xorq        %rax, %rax               # clear rax
     call        scanf
     xorq        %rax, %rax               # clear rax
-   # movb        %sil, 256(%rsp)          # put n2 in the stack (n2 < 255 so it's requires only one byte)
 
     xorq        %rdi, %rdi               # clear rdi
     xorq        %rsi, %rsi               # clear rsi
@@ -48,21 +46,19 @@ run_main:
     xorq        %rax, %rax               # clear rax
     call        scanf
     xorq        %rax, %rax               # clear rax
-   # movq        %rsi, 257(%rsp)          # set storage to address of str2
-    
+
     movq        $numFormat, %rdi         # load format for int
     leaq        512(%rsp), %rsi          # set storage to address of choice
     xorq        %rax, %rax               # clear rax
     call        scanf
     xorq        %rax, %rax               # clear rax
-   # movq        %rsi, 512(%rsp)          # put choice in the stack
-    
+
     xorq        %rdi, %rdi               # clear rdi
     xorq        %rsi, %rsi               # clear rsi
     xorq        %rdx, %rdx               # clear rdx
     leaq        (%rsp), %rdi             # first variable - &str1
     leaq        256(%rsp), %rsi          # second variable - &str2
-    movq        512(%rsp), %rdx          # third variable - choice
+    movb        512(%rsp), %dl           # third variable - choice
     call        run_func
 
     movq	    $0, %rax                 # return value is zero

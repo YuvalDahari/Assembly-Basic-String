@@ -1,8 +1,9 @@
-#include <stdio.h>
 #include "pstring.h"
+
+void run_main();
 
 int main() {
 
-    func_select();
+    run_main();
 	return 0;
 }

@@ -149,6 +149,15 @@ run_func:
     xorq        %rax, %rax               # clear rax
     call        printf
 
+    leaq        (%rsp), %rsi             # first variable - old char
+    xorq        %rdx, %rdx               # clear rdx
+    leaq        16(%rsp), %rdx           # second variable - new char
+    leaq        1(%r12), %rcx            # third variable - pstr1->str
+    leaq        1(%r13), %r8             # forth variable - pstr2->str
+    xorq        %rax, %rax               # clear rax
+    call        printf
+
+
     addq        $32, %rsp                # dislocate memory
     jmp         .End                     # break
 

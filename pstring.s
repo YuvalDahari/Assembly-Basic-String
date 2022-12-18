@@ -118,8 +118,8 @@ pstrijcpy:
     je          .EndCopyLoop             # break
 
   .Copy:
-    movb        (%r12), %r14b            # temp = dst[i]
-    movb        %r14b, (%r13)            # src[i] = temp
+    movb        (%r13), %r14b            # temp = src[i]
+    movb        %r14b, (%r12)            # dst[i] = temp
 
     incb        %dl                      # i++
     incq        %r12

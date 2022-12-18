@@ -28,16 +28,13 @@ replaceChar:
     leaq        (%rdi), %rbx             # char* temp = pstr->str
     xorq        %rax, %rax               # char size = 0
     call        pstrlen                  # size = pstr->size
-    pushq       %r12                     # r12 is a callee save
-    xorq        %r12, %r12               # clear r12, because 'size' is only one byte
-    movq        %rax, %r12               # r12 = size
 
     xorq        %rcx, %rcx               # int i = 0
 
   .ReaplaceLoop:
     incq        %rcx                     # i++
     incq        %rbx                     # move to the next char
-    cmpq        %rcx, %r12               # while(i <= size)
+    cmpq        %rcx, %rax               # while(i <= size)
     jl          .EndReaplaceLoop         # break
 
   .IfEqual:
@@ -53,10 +50,7 @@ replaceChar:
     movq        %rdi, %rax               # updating return value
 
     # Releasing and restoring the stack and rgisters memory
-    movq        -8(%rbp), %rbx           # restore rbx
-    movq        -16(%rbp), %r12          # restore r12
-    popq        %r12                     # restore rbx
-    popq        %rbx                     # restore r12
+    popq        %rbx                     # restore rbx
     movq	    %rbp, %rsp               # restore the old stack pointer - release all used memory
     popq	    %rbp                     # restore old frame pointer
 

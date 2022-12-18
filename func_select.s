@@ -149,6 +149,18 @@ run_func:
     xorq        %rax, %rax               # clear rax
     call        printf
 
+    movq        %r13, %rdi               # rdi = pstr2
+    xorq        %rax, %rax               # char size2 = 0
+    call        pstrlen                  # size2 = pstr2->size
+    xorq        %rsi, %rsi               # clear rsi
+    movq        %rax, %rsi               # first variable - pstr1->size
+
+    xorq        %rdx, %rdx               # clear rdx
+    leaq        1(%r13), %rdx            # first variable - pstr1->str
+    movq        $pstrijcpyCase, %rdi     # load format for printf
+    xorq        %rax, %rax               # clear rax
+    call        printf
+
     addq        $32, %rsp                # dislocate memory
     jmp         .End                     # break
 

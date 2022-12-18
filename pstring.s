@@ -218,8 +218,7 @@ pstrijcmp:
     movq        %rsp, %rbp               # create the new frame pointer
     pushq       %r12                     # r12 is a callee save
     pushq       %r13                     # r13 is a callee save
-    pushq       %r14                     # register for the compare
-    xorq        %r14, %r14               # clear r14
+    xorq        %r8, %r8                 # clear r8, register for the compare
 
     leaq        1(%rdi), %r12            # char* temp1 = src->str
     leaq        1(%rsi), %r13            # char* temp2 = dst->str
@@ -234,14 +233,14 @@ pstrijcmp:
     xorq        %rax, %rax               # char dstSize = 0
     call        pstrlen                  # dstSize = dst->size
     cmpq        %rcx, %rax               # if (dstSize < j)
-    jg          .ComperFail              # print("invalid input!\n") & return -2
+    jl          .ComperFail              # print("invalid input!\n") & return -2
 
     pushq       %rdi                     # save rdi
     xorq        %rax, %rax               # char srcSize = 0
     movq        %rsi, %rdi               # initialize rsi to rdi, for implements pstrlen()
     call        pstrlen                  # srcSize = src->size
     cmpq        %rcx, %rax               # if (srcSize < j)
-    jg          .ComperFail              # print("invalid input!\n") & return -2
+    jl          .ComperFail              # print("invalid input!\n") & return -2
 
     popq        %rdi                     # restore rdi
 
@@ -273,26 +272,24 @@ pstrijcmp:
     jmp         .ComperLoop              # continue
 
   .Ll:
-    movq        $-1, %r14                # set compare value as -1
+    movq        $-1, %rax                # set compare value as -1
     jmp         .EndComper
 
   .Lg:
-    movq        $1, %r14                 # set compare value as 1
+    movq        $1, %rax                 # set compare value as 1
     jmp         .EndComper
 
   .EndComperLoop:
-    movq        $0, %r14                 # set compare value as 0
+    movq        $0, %rax                 # set compare value as 0
     jmp         .EndComper
 
   .ComperFail:
     movq        $error, %rdi             # load format string
     xorq        %rax, %rax               # clear rax
     call        printf
-    movq        $-2, %r14                # set compare value as -2
+    movq        $-2, %rax                # set compare value as -2
 
   .EndComper:
-    movq        %r14, %rax               # set return value as compare value
-    popq        %r14                     # restore r14
     popq        %r13                     # restore r13
     popq        %r12                     # restore r12
     movq	    %rbp, %rsp               # restore the old stack pointer - release all used memory

@@ -226,20 +226,20 @@ pstrijcmp:
     # Varify input
     cmpq        %rcx, %rdx               # if (i > j)
     jg          .ComperFail              # print("invalid input!\n") & return -2
-    cmpq        $0, %rdx                 # if (i < 0)
+    cmpb        $0, %dl                  # if (i < 0)
     jl          .ComperFail              # print("invalid input!\n") & return -2
 
     # Checking the boundaries
     xorq        %rax, %rax               # char dstSize = 0
     call        pstrlen                  # dstSize = dst->size
-    cmpq        %rcx, %rax               # if (dstSize < j)
+    cmpb        %cl, %al                 # if (dstSize < j)
     jl          .ComperFail              # print("invalid input!\n") & return -2
 
     pushq       %rdi                     # save rdi
     xorq        %rax, %rax               # char srcSize = 0
     movq        %rsi, %rdi               # initialize rsi to rdi, for implements pstrlen()
     call        pstrlen                  # srcSize = src->size
-    cmpq        %rcx, %rax               # if (srcSize < j)
+    cmpb        %cl, %al                 # if (srcSize < j)
     jl          .ComperFail              # print("invalid input!\n") & return -2
 
     popq        %rdi                     # restore rdi
@@ -262,8 +262,8 @@ pstrijcmp:
     movb        (%r12), %r14b            # temp = dst[i]
     cmpb        %r14b, (%r13)            # comper (temp (dst[i]) & src[i])
 
-    ja          .Lg                      # src[i] > dst[i]
-    jb          .Ll                      # src[i] < dst[i]
+    ja          .MINUS1                  # src[i] > dst[i]
+    jb          .PLUS1                   # src[i] < dst[i]
 
     incb        %dl                      # i++
     incq        %r12
@@ -271,11 +271,11 @@ pstrijcmp:
 
     jmp         .ComperLoop              # continue
 
-  .Ll:
+  .MINUS1:
     movq        $-1, %rax                # set compare value as -1
     jmp         .EndComper
 
-  .Lg:
+  .PLUS1:
     movq        $1, %rax                 # set compare value as 1
     jmp         .EndComper
 

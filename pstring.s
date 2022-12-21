@@ -224,8 +224,8 @@ pstrijcmp:
     leaq        1(%rsi), %r13            # char* temp2 = dst->str
 
     # Varify input
-    cmpq        %rcx, %rdx               # if (i > j)
-    jg          .ComperFail              # print("invalid input!\n") & return -2
+    cmpb        %cl, %dl                 # if (i >= j)
+    jl          .ComperFail              # print("invalid input!\n") & return -2
     cmpb        $0, %dl                  # if (i < 0)
     jl          .ComperFail              # print("invalid input!\n") & return -2
 
@@ -280,6 +280,11 @@ pstrijcmp:
     jmp         .EndComper
 
   .EndComperLoop:
+   movb        (%r12), %r14b             # temp = dst[i]
+   cmpb         %r14b, (%r13)            # comper (temp (dst[i]) & src[i])
+
+    ja          .MINUS1                  # src[i] > dst[i]
+    jb          .PLUS1                   # src[i] < dst[i]
     movq        $0, %rax                 # set compare value as 0
     jmp         .EndComper
 

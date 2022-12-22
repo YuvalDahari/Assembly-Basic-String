@@ -19,7 +19,6 @@ run_main:
     subq        $528, %rsp 
     
     movq        $numFormat, %rdi         # load format for int
-    xorq        %rdi,, %rsi              # clear rsi
     leaq        (%rsp), %rsi             # set storage to address of n1
     xorq        %rax, %rax               # clear rax
     call        scanf

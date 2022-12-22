@@ -135,6 +135,9 @@ pstrijcpy:
     popq        %rsi                     # restore rsi
 
   .EndCopy:
+    movb        (%r13), %r14b            # temp = src[i]
+    movb        %r14b, (%r12)            # dst[i] = temp
+
     movq        %r15, %rax               # making rax (the return value) as pointer to the updating dst
     popq        %r15                     # restore r15
     popq        %r14                     # restore r14

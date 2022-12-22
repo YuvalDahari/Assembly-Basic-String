@@ -22,7 +22,6 @@ run_main:
     leaq        (%rsp), %rsi             # set storage to address of n1
     xorq        %rax, %rax               # clear rax
     call        scanf
-    xorq        %rax, %rax               # clear rax
 
     xorq        %rdi, %rdi               # clear rdi
     xorq        %rsi, %rsi               # clear rsi
@@ -30,13 +29,11 @@ run_main:
     leaq        1(%rsp), %rsi            # set storage to address of str1
     xorq        %rax, %rax               # clear rax
     call        scanf
-    xorq        %rax, %rax               # clear rax
 
     movq        $numFormat, %rdi         # load format for int
     leaq        256(%rsp), %rsi          # set storage to address of n2
     xorq        %rax, %rax               # clear rax
     call        scanf
-    xorq        %rax, %rax               # clear rax
 
     xorq        %rdi, %rdi               # clear rdi
     xorq        %rsi, %rsi               # clear rsi
@@ -44,13 +41,11 @@ run_main:
     leaq        257(%rsp), %rsi          # set storage to address of str2
     xorq        %rax, %rax               # clear rax
     call        scanf
-    xorq        %rax, %rax               # clear rax
 
     movq        $numFormat, %rdi         # load format for int
     leaq        512(%rsp), %rsi          # set storage to address of choice
     xorq        %rax, %rax               # clear rax
     call        scanf
-    xorq        %rax, %rax               # clear rax
 
     xorq        %rdi, %rdi               # clear rdi
     xorq        %rsi, %rsi               # clear rsi
@@ -60,7 +55,7 @@ run_main:
     movb        512(%rsp), %dl           # third variable - choice
     call        run_func
 
-    movq	    $0, %rax                 # return value is zero
+    xorq	    %rax, %rax               # return value is zero
     movq	    %rbp, %rsp               # restore the old stack pointer - release all used memory
     popq	    %rbp                     # restore old frame pointer
     ret             		             # return

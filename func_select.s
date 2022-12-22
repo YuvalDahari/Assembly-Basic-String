@@ -188,7 +188,7 @@ run_func:
 
     jmp         .End                     # break
 
-  .case37:                               # pstrijcpy
+  .case37:                               # pstrijcmp
     subq        $32, %rsp                # allocate memory for two scanf
 
     movq        $scanfInt, %rdi          # load format for scanf

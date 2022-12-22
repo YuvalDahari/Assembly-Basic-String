@@ -19,12 +19,12 @@ run_main:
     subq        $528, %rsp 
     
     movq        $numFormat, %rdi         # load format for int
+    xorq        %rdi,, %rsi              # clear rsi
     leaq        (%rsp), %rsi             # set storage to address of n1
     xorq        %rax, %rax               # clear rax
     call        scanf
     xorq        %rax, %rax               # clear rax
-    movb        %sil, (%rsp)             # put n1 in the stack (n1 < 255 so it's requires only one byte)
-    
+
     xorq        %rdi, %rdi               # clear rdi
     xorq        %rsi, %rsi               # clear rsi
     movq        $strFormat, %rdi         # load format for string

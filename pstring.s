@@ -1,4 +1,4 @@
-# Yuval Dahari 209125939
+# Yuval Dahari
 
 .section .rodata
     error:  .string "invalid input!\n"   # format for invalid input

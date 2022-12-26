@@ -1,4 +1,4 @@
-# Yuval Dahari 209125939
+# Yuval Dahari 
 
 .section .rodata
     pstrlenCase:       .string "first pstring length: %d, second pstring length: %d\n"                  #31

@@ -43,7 +43,6 @@ replaceChar:
 
   .Reaplace:
     movb        %dl, (%rbx)              # temp[i] = newChar
-    incq        %rbx                     # move to the next char
     jmp         .ReaplaceLoop            # continue
 
   .EndReaplaceLoop:

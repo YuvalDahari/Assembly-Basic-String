@@ -31,10 +31,6 @@ Contains the declarations of the necessary functions.
 Creates a runtime executable for the program.
 ### c.main.c
 Implementation of the main function in C, which calls run_main.
-### c.test-main_run.c 
-Implementation of the run_main function in C for testing purposes.
-### test-makefile
-A makefile that compiles the program with test cases.
 
 ## Implementation Details:
 - **Memory Layout**: Each Pstring is stored in the stack frame of main_run. The length precedes the character array, ensuring easy access and manipulation.
